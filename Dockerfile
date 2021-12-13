@@ -1,0 +1,69 @@
+FROM php:8.0.11-fpm as setup
+
+# Starting from scratch
+RUN apt-get clean && \ 
+    apt-get -y autoremove && \ 
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Dependencies
+RUN apt-get update
+
+RUN apt-get install -y libfreetype6-dev \ 
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    zlib1g-dev \
+    libicu-dev \
+    g++ \
+    mariadb-client \
+    supervisor \
+    cron
+
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-configure intl
+
+RUN docker-php-ext-install pdo_mysql \
+    exif \
+    pcntl \
+    bcmath \
+    intl \
+    gd \
+    opcache
+
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+# Custom php.ini config
+COPY php.ini /usr/local/etc/php/php.ini
+COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# ---- Unique for supervisor only ---->
+
+# Prepare log files
+RUN touch /var/log/cron.log \
+    && touch /var/log/queue.log \
+    && touch /var/log/supervisord.log
+
+# Add supervisor configuration
+COPY  supervisord.conf /etc/supervisor/supervisord.conf
+COPY  conf.d /etc/supervisor/conf.d
+
+# Crontab
+COPY  cron.d/schedule /etc/cron.d
+RUN chmod -R 644 /etc/cron.d \
+    && crontab /etc/cron.d/schedule
+
+# <---- Unique for supervisor only ----
+
+# Clean up
+RUN apt-get clean \
+    && apt-get -y autoremove \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
+# Set up default directory
+WORKDIR /var/www/api
+
+RUN useradd -ms /bin/bash dockeruser
+USER dockeruser
