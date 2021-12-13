@@ -47,11 +47,6 @@ RUN touch /var/log/cron.log \
 COPY  supervisord.conf /etc/supervisor/supervisord.conf
 COPY  conf.d /etc/supervisor/conf.d
 
-# Crontab
-COPY  cron.d/schedule /etc/cron.d
-RUN chmod -R 644 /etc/cron.d \
-    && crontab /etc/cron.d/schedule
-
 # <---- Unique for supervisor only ----
 
 # Clean up
