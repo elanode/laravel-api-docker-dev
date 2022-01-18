@@ -16,9 +16,11 @@ RUN apt-get install -y libfreetype6-dev \
     g++ \
     mariadb-client \
     supervisor \
-    cron
+    cron \
+    libzip-dev \
+    zip \
 
-RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-configure intl
 
 RUN docker-php-ext-install pdo_mysql \
@@ -27,7 +29,8 @@ RUN docker-php-ext-install pdo_mysql \
     bcmath \
     intl \
     gd \
-    opcache
+    opcache \
+    zip
 
 RUN pecl install redis \
     && docker-php-ext-enable redis
