@@ -20,7 +20,7 @@ RUN apt-get install -y libfreetype6-dev \
     libzip-dev \
     zip
 
-RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include \
+RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-webp=/usr/include/ \
     && docker-php-ext-configure intl
 
 RUN docker-php-ext-install pdo_mysql \
