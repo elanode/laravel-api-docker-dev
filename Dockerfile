@@ -1,4 +1,4 @@
-FROM php:8.0.11-fpm as setup
+FROM php:8.1-fpm as setup
 
 # Starting from scratch
 RUN apt-get clean && \ 
