@@ -45,7 +45,8 @@ COPY opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 # Prepare log files
 RUN touch /var/log/cron.log \
     && touch /var/log/queue.log \
-    && touch /var/log/supervisord.log
+    && touch /var/log/supervisord.log \
+    && touch /var/log/websockets.log
 
 # Add supervisor configuration
 COPY  supervisord.conf /etc/supervisor/supervisord.conf
